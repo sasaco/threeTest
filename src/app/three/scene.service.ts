@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from '@three-ts/orbit-controls';
+import { GUI } from './libs/dat.gui.module.js';
 
 @Injectable({
   providedIn: 'root'
@@ -19,10 +20,13 @@ export class SceneService {
   private Width: number = 0;
   private Height: number = 0;
 
-  private GridHelper!: THREE.GridHelper;
+  private axisHelper: THREE.AxesHelper;
+  private GridHelper: THREE.GridHelper;
+  // gui
+  public gui: GUI;
 
   // 初期化
-  public constructor() {
+  public constructor(){
     // シーンを作成
     this.scene = new THREE.Scene();
     // シーンの背景を白に設定
@@ -56,12 +60,20 @@ export class SceneService {
     // 床面を生成する
     this.createHelper();
 
+    //
+    this.gui = new GUI();
+    this.gui.domElement.id = 'gui_css';
+    this.gui.open();
+
   }
 
 
   // 床面を生成する
   private createHelper() {
-    this.GridHelper = new THREE.GridHelper(200, 20);
+    this.axisHelper = new THREE.AxesHelper(20);
+    this.scene.add(this.axisHelper);
+
+    this.GridHelper = new THREE.GridHelper(10, 10);
     this.GridHelper.geometry.rotateX(Math.PI / 2);
     this.scene.add(this.GridHelper);                      
   }
@@ -88,9 +100,9 @@ export class SceneService {
       70,
       aspectRatio,
       0.1,
-      1000
+      20
     );
-    this.camera.position.set(0, -50, 20);
+    this.camera.position.set(0, -5, 2);
     this.camera.name = 'camera';
     this.scene.add(this.camera);
 

@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, ViewChild, HostListener, NgZone, OnDestroy } from '@angular/core';
 import * as THREE from 'three';
+import { ThreeMembersService } from '../components/three/geometry/three-members.service';
 
 import { SceneService } from './scene.service';
 
@@ -14,7 +15,8 @@ export class ThreeComponent implements AfterViewInit, OnDestroy {
 
 
   constructor(private ngZone: NgZone,
-              private scene: SceneService) {
+              private scene: SceneService,
+              private member: ThreeMembersService) {
 
     THREE.Object3D.DefaultUp.set(0, 0, 1);
   }
@@ -31,6 +33,8 @@ export class ThreeComponent implements AfterViewInit, OnDestroy {
                       window.innerHeight);
     // レンダリングする
     this.animate();
+
+    this.member.OnInit();
   }
 
   ngOnDestroy() {

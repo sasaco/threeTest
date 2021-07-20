@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { SceneService } from './three/scene.service';
 import { ThreeComponent } from './three/three.component';
 
 @NgModule({
@@ -14,7 +15,11 @@ import { ThreeComponent } from './three/three.component';
     BrowserModule,
     AppRoutingModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    SceneService
+  ],
+  bootstrap: [
+    AppComponent
+  ]
 })
 export class AppModule { }
