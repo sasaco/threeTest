@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { SceneService } from "../../../three/scene.service";
 import * as THREE from "three";
+//import { ThreeLoadService } from "./three-load/three-load.service";
 
 @Injectable({
   providedIn: "root",
@@ -23,11 +24,12 @@ export class ThreeMembersService {
   private rotateZ: number;
   private height: number;
   private params: any; // GUIの表示制御
-  private gui: any;
+  public gui: any;
 
   private group: any;
 
-  constructor( private scene: SceneService ) {
+  constructor( private scene: SceneService,
+               /*private three_load: ThreeLoadService*/) {
 
     this.geometry = new THREE.CylinderBufferGeometry();
     this.memberList = new THREE.Object3D();
@@ -62,7 +64,7 @@ export class ThreeMembersService {
     const y: number = (i.y + j.y) / 2;
     const z: number = (i.z + j.z) / 2;
     // 要素をシーンに追加
-    const geometry = new THREE.CylinderBufferGeometry(0.01, 0.05, len, 5);
+    const geometry = new THREE.CylinderBufferGeometry(0.01, 0.01, len, 5);
     //const geometry = new THREE.SphereBufferGeometry(0.02, 3, 3);
 
     // 要素をシーンに追加
@@ -107,7 +109,7 @@ export class ThreeMembersService {
     this.scene.add(group);
 
 
-    this.guiEnable();
+    //this.guiEnable();
   }
 
   // 要素の太さを決定する基準値
@@ -117,7 +119,10 @@ export class ThreeMembersService {
   }
 
   // データが変更された時の処理
-  public changeData(): void {
+  public changeData(rotateZ, height): void {
+
+    this.rotateZ = rotateZ;
+    this.height = height;
 
     const i = new THREE.Vector3(0,0,0);
     const j = new THREE.Vector3(1.0,0,0);;
@@ -174,7 +179,7 @@ export class ThreeMembersService {
   }
 
   // guiを表示する
-  private guiEnable(): void {
+  /*public guiEnable(): void {
     if (this.gui !== null) {
       return;
     }
@@ -185,6 +190,7 @@ export class ThreeMembersService {
       .onChange((value) => {
         this.rotateZ = value;
         this.changeData();
+        //this.three_load.changeData(this.rotateZ, this.height);
         this.scene.render();
     });
     this.gui.add(this.params, 'height', -1.0, 1.0)
@@ -192,11 +198,12 @@ export class ThreeMembersService {
       .onChange((value) => {
         this.height = value;
         this.changeData();
+        //this.three_load.changeData(this.rotateZ, this.height);
         this.scene.render();
     });
     this.gui.closed = false
 
-  }
+  }*/
 
 
   // guiを非表示にする
