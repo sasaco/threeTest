@@ -91,8 +91,16 @@ export class ThreeLoadDistribute {
     group0.add(child);
     group0.name = "group";
 
+    // Create:
+    // const myText = new Text()
+    // myText.text = 'Hello world!'
+    // myText.fontSize = 0.2
+    // myText.color = 0x9966FF
+    // myText.sync()
+
     const group = new THREE.Group();
     group.add(group0);
+    // group.add(myText);
     group["points"] = p.points;
     group["L1"] = p.L1;
     group["L"] = p.L;
@@ -114,6 +122,7 @@ export class ThreeLoadDistribute {
       A = Math.PI - A;
     }
     group.rotateZ(A);
+    console.log(1, group.rotation);
 
     const lenXY = Math.sqrt(
       Math.pow(localAxis.x.x, 2) + Math.pow(localAxis.x.y, 2)

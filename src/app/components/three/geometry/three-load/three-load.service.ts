@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { SceneService } from "src/app/three/scene.service";
 
 import * as THREE from "three";
+import { Vector2 } from "three";
 
 import { ThreeMembersService } from "../three-members.service";
 
@@ -125,19 +126,15 @@ export class ThreeLoadService {
     // Create:
     this.myText = new Text()
     this.scene.add(this.myText)
-
-    // Set properties to configure:
-    const p = this.loadEditor[ThreeLoadDistribute.id].getPoints(
-      nodei, nodej, direction, load.L1, load.L2, P1, P2, 0.5);
     this.myText.text = 'Hello world!'
     this.myText.fontSize = 0.2
     this.myText.color = 0x9966FF
     this.myText.sync()
 
-    this.myText.lookAt(localAxis.x);
-    this.myText.rotateZ(Math.PI/2);
-    this.myText.rotateX(-Math.PI/2);
-    this.myText.rotateY(this.rotateX * Math.PI / 180);
+    // this.myText.lookAt(localAxis.x);
+    // this.myText.rotateZ(Math.PI/2);
+    // this.myText.rotateX(-Math.PI/2);
+    // this.myText.rotateY(this.rotateX * Math.PI / 180);
 
     //this.guiEnable();
   }
@@ -171,11 +168,11 @@ export class ThreeLoadService {
     new_position_x = Math.sqrt((0.5**2 - height_c**2) / (1 + a**2)) * Math.sign(new_position_x);
     new_position_y = Math.sqrt(Math.abs(0.5**2 - height_c**2 - new_position_x**2)) * Math.sign(new_position_y);
     new_position_z = height_c;
-    const axiss = this.three_member.localAxis(0, 0, 0, new_position_x*2, new_position_y*2, new_position_z*2 ,0)
+    const localAxis = this.three_member.localAxis(0, 0, 0, new_position_x*2, new_position_y*2, new_position_z*2 ,0)
 
     //オブジェクトの再生成
     const nodei = new THREE.Vector3(0, 0, 0);
-    const nodej = new THREE.Vector3(axiss.x.x, axiss.x.y, axiss.x.z);
+    const nodej = new THREE.Vector3(localAxis.x.x, localAxis.x.y, localAxis.x.z);
     const direction = "z";
     const load = {L1: 0.05, L2: 0.03,};
     const P1 = -1.0;
@@ -183,25 +180,47 @@ export class ThreeLoadService {
 
     // 分布荷重
     const arrow = this.loadEditor[ThreeLoadDistribute.id].create(
-      nodei, nodej, axiss, direction,
+      nodei, nodej, localAxis, direction,
       load.L1, load.L2, P1, P2);
 
     this.DistributeLoadList.children.push(arrow);
 
-    const cg_x = Math.PI + this.rotateX * Math.PI / 180;
-    
-
-    this.myText.lookAt(axiss.x);
+    // this.myText.lookAt(localAxis.x);
     // 軸方向荷重や温度荷重
     // this.myText.rotateX(Math.PI/2);
     // this.myText.rotateY(cg_x);
     // this.myText.rotateZ(Math.PI/2);
 
     // 分布荷重 z軸
-    this.myText.rotateZ(Math.PI/2);
-    this.myText.rotateX(-Math.PI/2);
-    this.myText.rotateY(this.rotateX * Math.PI / 180);
-    
+    // this.myText.rotateZ(Math.PI/2);
+    // this.myText.rotateX(-Math.PI/2);
+    // this.myText.rotateY(this.rotateX * Math.PI / 180);
+
+    const group = this.myText;
+    group.rotation.set(0,0,0);
+
+    const XY = new Vector2(localAxis.x.x, localAxis.x.y).normalize();
+    let A = Math.asin(XY.y)
+
+    if (XY.x < 0) {
+      A = Math.PI - A;
+    }
+    group.rotateZ(A);
+    console.log(3, group.rotation);
+
+    const lenXY = Math.sqrt(
+      Math.pow(localAxis.x.x, 2) + Math.pow(localAxis.x.y, 2)
+    );
+    const XZ = new THREE.Vector2(lenXY, localAxis.x.z).normalize();
+    group.rotateY(-Math.asin(XZ.y));
+    if (localAxis.x.x === 0 && localAxis.x.y === 0) {
+      // 鉛直の部材
+      if (direction === "z") { group.rotateX(-Math.PI); }
+    } else {
+      if (direction === "z") { group.rotateX(-Math.PI / 2); }
+    }
+
+
   }
 
 
