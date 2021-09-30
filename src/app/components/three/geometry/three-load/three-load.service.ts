@@ -159,7 +159,7 @@ export class ThreeLoadService {
     // this.myText.rotateZ(Math.PI/2);
     // this.myText.rotateX(-Math.PI/2);
     // this.myText.rotateY(this.rotateX * Math.PI / 180);
-
+    /*
     const group = this.myText;
     group.rotation.set(0,0,0);
 
@@ -183,7 +183,7 @@ export class ThreeLoadService {
     } else {
       if (direction === "z") { group.rotateX(-Math.PI / 2); }
     }
-
+    */
 
   }
 
@@ -217,15 +217,19 @@ export class ThreeLoadService {
     // this.myText.color = 0x9966FF
     // this.myText.sync()
 
-    // canvasをtextureに載せ、さらにmaterialに載せる。
-    const canvasTexture = new THREE.CanvasTexture(
-      this.createCanvasForTexture(500, 500, 'Hello World!', 40)
-    );
+
+    /*/ つねに前を向くテキスト
     this.createSprite(
-      canvasTexture,
+      new THREE.CanvasTexture(
+        this.createCanvasForTexture(500, 500, 'Hello World!', 40)
+      ),
       new THREE.Vector3( 1, 1, 1 ),
       new THREE.Vector3( 0, 0, 0 )
     );
+    */
+
+    // 普通のテキスト
+    this.createMesh();
 
   }
   
@@ -239,6 +243,7 @@ export class ThreeLoadService {
     this.scene.add(sprite);
   };
 
+  
   private createCanvasForTexture(canvasWidth, canvasHeight, text, fontSize): HTMLCanvasElement {
     // 貼り付けるcanvasを作成。
     const canvasForText = document.createElement('canvas');
@@ -260,6 +265,93 @@ export class ThreeLoadService {
     );
     return canvasForText;
   };
+
+  
+  private createMesh() {
+    const segment = 1;
+
+    const geometry = new THREE.PlaneBufferGeometry(2, 2, segment, segment);
+
+    // テクスチャの作成 前述の「テクスチャを作る.js」を参照
+    const texture = this.createTexture({
+      text: 'HOGE', // 描画したいテキスト
+      fontSize: 30, // フォントサイズ
+    });
+    const material = new THREE.MeshStandardMaterial({
+      map: texture
+    });
+
+    // // マテリアルの作成
+    // const material = new THREE.RawShaderMaterial({
+    //   uniforms: {
+    //     texture: { value: texture },
+    //     time: { value: 0.0 },
+    //     speed: { value: 1.0 },
+    //     resolution: { value: this.Config.aspectRatio },
+    //   },
+    //   // vertexShader: vertexShader,
+    //   // fragmentShader: fragmentShader,
+    //   transparent: false,
+    // });
+
+    const mesh = new THREE.Mesh(geometry, material);
+    this.scene.add(mesh);
+  }
+
+  private Config = {
+    dpr: 1, // device pixel ratio
+    aspectRatio: 1.0, // 画面アスペクト比
+  };
+
+  /**
+   * 2D Canvasからテクスチャを作成する
+   * @param {Object} options
+   * @param {stirng} options.text 描画したい文字列
+   * @param {number} options.fontSize フォントサイズ
+   * @return {Object} テクスチャを返す。
+   * @memberof Canvas
+   */
+  private createTexture(options): THREE.CanvasTexture {
+    // Canvas要素を作成
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // measureTextするためいったん設定
+    const fontFamily = 'monospace';
+    ctx.font = `bold ${options.fontSize * this.Config.dpr}px '${fontFamily}'`;
+    const textWidth = ctx.measureText(options.text); // 文字の横幅を取得
+
+    // dprに対応したサイズを計算
+    const width = textWidth.width;
+    const height = options.fontSize * this.Config.dpr * 0.8; // 文字に合わせて高さを調整。ここの高さは任意で
+    // 幅を指定
+    canvas.width = width;
+    canvas.height = height;
+
+    // 中央にテキストを描画
+    ctx.font = `bold ${options.fontSize * this.Config.dpr}px '${fontFamily}'`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'hanging';
+    ctx.fillStyle = 'rgba(255, 255, 255, 1.0)';
+    ctx.fillText(options.text, -5, 0); // 文字が途切れないように調整。数値はよしなに
+
+    // ↓canvasの文字を確認したいとき。テキストを描画したcanvasをbodyに追加しているだけです。
+    // document.body.appendChild(canvas);
+    // canvas.style.backgroundColor = '#933';
+    // canvas.style.position = 'relative';
+
+    // テクスチャを作成
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = false;
+    // ↓ここら辺の設定をしておかないとthree.jsでエラーが出る時がある
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.format = THREE.RGBAFormat;
+
+    return texture;
+  }
+
+  
 
 
 
