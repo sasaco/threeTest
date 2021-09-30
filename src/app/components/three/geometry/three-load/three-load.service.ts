@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { SceneService } from "src/app/three/scene.service";
 
 import * as THREE from "three";
-import { Vector2 } from "three";
+import { Vector2, Vector3 } from "three";
 
 import { ThreeMembersService } from "../three-members.service";
 
@@ -102,43 +102,7 @@ export class ThreeLoadService {
     this.myText = Object
   }
 
-  //初期化
-  public OnInit(): void {
-
-    const nodei = new THREE.Vector3(0, 0, 0);
-    const nodej = new THREE.Vector3(1, 0, 0);
-    const localAxis = this.three_member.localAxis(
-      nodei.x, nodei.y, nodei.z, nodej.x, nodej.y, nodej.z, 0 );
-    const direction = "z";
-    const load = {L1: 0.05, L2: 0.03,};
-    const P1 = -1.0;
-    const P2 = -1.2;
-
-    // 分布荷重
-    const arrow = this.loadEditor[ThreeLoadDistribute.id].create(
-      nodei, nodej, localAxis, direction,
-      load.L1, load.L2, P1, P2);
-
-    this.DistributeLoadList.name = "Load";
-    this.DistributeLoadList.children.push(arrow);
-
-
-    // Create:
-    this.myText = new Text()
-    this.scene.add(this.myText)
-    this.myText.text = 'Hello world!'
-    this.myText.fontSize = 0.2
-    this.myText.color = 0x9966FF
-    this.myText.sync()
-
-    // this.myText.lookAt(localAxis.x);
-    // this.myText.rotateZ(Math.PI/2);
-    // this.myText.rotateX(-Math.PI/2);
-    // this.myText.rotateY(this.rotateX * Math.PI / 180);
-
-    //this.guiEnable();
-  }
-  
+ 
   // 荷重の入力が変更された場合
   public changeData(rotateX, rotateZ, height): void {
 
@@ -222,6 +186,81 @@ export class ThreeLoadService {
 
 
   }
+
+
+  //初期化
+  public OnInit(): void {
+
+    const nodei = new THREE.Vector3(0, 0, 0);
+    const nodej = new THREE.Vector3(1, 0, 0);
+    const localAxis = this.three_member.localAxis(
+      nodei.x, nodei.y, nodei.z, nodej.x, nodej.y, nodej.z, 0 );
+    const direction = "z";
+    const load = {L1: 0.05, L2: 0.03,};
+    const P1 = -1.0;
+    const P2 = -1.2;
+
+    // 分布荷重
+    const arrow = this.loadEditor[ThreeLoadDistribute.id].create(
+      nodei, nodej, localAxis, direction,
+      load.L1, load.L2, P1, P2);
+
+    this.DistributeLoadList.name = "Load";
+    this.DistributeLoadList.children.push(arrow);
+
+
+    // Create:
+    // this.myText = new Text()
+    // this.scene.add(this.myText)
+    // this.myText.text = 'Hello world!'
+    // this.myText.fontSize = 0.2
+    // this.myText.color = 0x9966FF
+    // this.myText.sync()
+
+    // canvasをtextureに載せ、さらにmaterialに載せる。
+    const canvasTexture = new THREE.CanvasTexture(
+      this.createCanvasForTexture(500, 500, 'Hello World!', 40)
+    );
+    this.createSprite(
+      canvasTexture,
+      new THREE.Vector3( 1, 1, 1 ),
+      new THREE.Vector3( 0, 0, 0 )
+    );
+
+  }
+  
+  // spriteを作成し、sceneに追加
+  private createSprite(texture: THREE.CanvasTexture, scale: Vector3, position: Vector3): void {
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+    const sprite = new THREE.Sprite(spriteMaterial);
+    sprite.scale.set(scale.x, scale.y, scale.z);
+    sprite.position.set(position.x, position.y, position.z);
+
+    this.scene.add(sprite);
+  };
+
+  private createCanvasForTexture(canvasWidth, canvasHeight, text, fontSize): HTMLCanvasElement {
+    // 貼り付けるcanvasを作成。
+    const canvasForText = document.createElement('canvas');
+    const ctx = canvasForText.getContext('2d');
+    ctx.canvas.width = canvasWidth;
+    ctx.canvas.height = canvasHeight;
+    // 透過率50%の青背景を描く
+    ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    //
+    ctx.fillStyle = 'black';
+    ctx.font = `${fontSize}px serif`;
+    ctx.fillText(
+      text,
+      // x方向の余白/2をx方向開始時の始点とすることで、横方向の中央揃えをしている。
+      (canvasWidth - ctx.measureText(text).width) / 2,
+      // y方向のcanvasの中央に文字の高さの半分を加えることで、縦方向の中央揃えをしている。
+      canvasHeight / 2 + ctx.measureText(text).actualBoundingBoxAscent / 2
+    );
+    return canvasForText;
+  };
+
 
 
 }

@@ -91,13 +91,6 @@ export class ThreeLoadDistribute {
     group0.add(child);
     group0.name = "group";
 
-    // Create:
-    // const myText = new Text()
-    // myText.text = 'Hello world!'
-    // myText.fontSize = 0.2
-    // myText.color = 0x9966FF
-    // myText.sync()
-
     const group = new THREE.Group();
     group.add(group0);
     // group.add(myText);
