@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, ViewChild, HostListener, NgZone, OnDestroy } from '@angular/core';
 import * as THREE from 'three';
+import { ThreeBitmapFontsService } from '../components/three/geometry/three-bitmap-fonts.service';
 import { ThreeMembersService } from '../components/three/geometry/three-members.service';
 
 import { SceneService } from './scene.service';
@@ -16,7 +17,8 @@ export class ThreeComponent implements AfterViewInit, OnDestroy {
 
   constructor(private ngZone: NgZone,
               private scene: SceneService,
-              private member: ThreeMembersService) {
+              private member: ThreeMembersService,
+              private bitmap: ThreeBitmapFontsService) {
 
     THREE.Object3D.DefaultUp.set(0, 0, 1);
   }
@@ -35,6 +37,7 @@ export class ThreeComponent implements AfterViewInit, OnDestroy {
     this.animate();
 
     this.member.OnInit();
+    this.bitmap.OnInit();
   }
 
   ngOnDestroy() {
